@@ -4,23 +4,26 @@
 
 package main
 
-import "runtime"
+import (
+	"os"
+	"runtime"
+
+	l "github.com/ernestio/builder-library"
+)
+
+var s l.Scheduler
 
 func main() {
-	n := natsClient()
-	r := redisClient()
+	s.Setup(os.Getenv("NATS_URI"))
 
-	// Process requests
-	processRequest(n, r, "networks.create", "network.create")
-	processRequest(n, r, "networks.delete", "network.delete")
+	s.ProcessRequest("networks.create", "network.create")
+	s.ProcessRequest("networks.delete", "network.delete")
 
-	// Process resulting success
-	processResponse(n, r, "network.create.done", "networks.create.", "network.create", "completed")
-	processResponse(n, r, "network.delete.done", "networks.delete.", "network.delete", "completed")
+	s.ProcessSuccessResponse("network.create.done", "network.create", "networks.create.done")
+	s.ProcessSuccessResponse("network.delete.done", "network.delete", "networks.delete.done")
 
-	// Process resulting errors
-	processResponse(n, r, "network.create.error", "networks.create.", "network.create", "errored")
-	processResponse(n, r, "network.delete.error", "networks.delete.", "network.delete", "errored")
+	s.ProcessFailedResponse("network.create.error", "networks.create.error")
+	s.ProcessFailedResponse("network.delete.error", "networks.delete.error")
 
 	runtime.Goexit()
 }
