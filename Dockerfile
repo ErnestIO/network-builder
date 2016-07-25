@@ -7,4 +7,4 @@ WORKDIR /go/src/github.com/ernestio/network-builder
 
 RUN make deps && go install
 
-ENTRYPOINT /go/bin/network-builder
+ENTRYPOINT ./entrypoint.sh
