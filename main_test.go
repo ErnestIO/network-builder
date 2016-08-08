@@ -13,7 +13,12 @@ import (
 	"time"
 
 	"github.com/nats-io/nats"
+	"gopkg.in/redis.v3"
 )
+
+var setup = false
+var n *nats.Conn
+var r *redis.Client
 
 type DummyEvent struct {
 	Type string `json:"type"`
@@ -33,13 +38,21 @@ func waitTime(ch chan bool, timeout time.Duration) error {
 	return errors.New("timeout")
 }
 
+func testSetup() {
+	if setup == false {
+		os.Setenv("NATS_URI", "nats://localhost:4222")
+
+		n = natsClient()
+		n.Subscribe("config.get.redis", func(msg *nats.Msg) {
+			n.Publish(msg.Reply, []byte(`{"DB":0,"addr":"localhost:6379","password":""}`))
+		})
+		r = redisClient()
+		setup = true
+	}
+}
+
 func TestProvisionAllNetworksBasic(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
-
+	testSetup()
 	processRequest(n, r, "networks.create", "network.provision")
 
 	ch := make(chan bool)
@@ -75,11 +88,7 @@ func TestProvisionAllNetworksBasic(t *testing.T) {
 }
 
 func TestProvisionAllNetworksWithInvalidMessage(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
+	testSetup()
 
 	processRequest(n, r, "networks.create", "network.provision")
 
@@ -106,12 +115,7 @@ func TestProvisionAllNetworksWithInvalidMessage(t *testing.T) {
 }
 
 func TestProvisionAllNetworksWithInvalidCIDR(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
-
+	testSetup()
 	processRequest(n, r, "networks.create", "network.provision")
 
 	ch := make(chan bool)
@@ -137,11 +141,7 @@ func TestProvisionAllNetworksWithInvalidCIDR(t *testing.T) {
 }
 
 func TestProvisionAllNetworksSendingTwoNetworks(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
+	testSetup()
 
 	processRequest(n, r, "networks.create", "network.provision")
 
@@ -165,11 +165,7 @@ func TestProvisionAllNetworksSendingTwoNetworks(t *testing.T) {
 }
 
 func TestProvisionAllnetworksWithDifferentMessageType(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
+	testSetup()
 	processRequest(n, r, "networks.create", "network.provision")
 
 	ch := make(chan bool)
@@ -187,11 +183,7 @@ func TestProvisionAllnetworksWithDifferentMessageType(t *testing.T) {
 }
 
 func TestHandleNetworkCompletedEvent(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
+	testSetup()
 
 	processResponse(n, r, "network.create.done", "networks.create.", "network.provision", "completed")
 
@@ -228,11 +220,7 @@ func TestHandleNetworkCompletedEvent(t *testing.T) {
 }
 
 func TestHandleNextInSequenceEvent(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
+	testSetup()
 
 	processResponse(n, r, "network.create.done", "networks.create.", "network.provision", "completed")
 
@@ -275,11 +263,7 @@ func TestHandleNextInSequenceEvent(t *testing.T) {
 }
 
 func TestHandleFinalEvent(t *testing.T) {
-	os.Setenv("NATS_URI", "nats://localhost:4222")
-	os.Setenv("REDIS_ADDR", "localhost:6379")
-
-	n := natsClient()
-	r := redisClient()
+	testSetup()
 
 	processResponse(n, r, "network.create.done", "networks.create.", "network.provision", "completed")
 
