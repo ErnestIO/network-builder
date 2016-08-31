@@ -15,13 +15,13 @@ cover:
 	go test -v ./... --cover
 
 deps: dev-deps
-	go get -u github.com/nats-io/nats
-	go get -u gopkg.in/redis.v3
-	go get -u github.com/ernestio/ernest-config-client
-	go get -u github.com/ernestio/builder-library
+	go get github.com/nats-io/nats
+	go get gopkg.in/redis.v3
+	go get github.com/ernestio/ernest-config-client
+	go get github.com/ernestio/builder-library
 
 dev-deps:
-	go get -u github.com/golang/lint/golint
+	go get github.com/golang/lint/golint
 
 clean:
 	go clean
