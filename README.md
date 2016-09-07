@@ -8,8 +8,8 @@ Once all of them are fully processed it will emit back a message 'networks.creat
 
 ## Build status
 
-* Master: [![CircleCI Master](https://circleci.com/gh/ErnestIO/network-builder/tree/master.svg?style=svg)](https://circleci.com/gh/ErnestIO/network-builder/tree/master)
-* Develop: [![CircleCI Develop](https://circleci.com/gh/ErnestIO/network-builder/tree/develop.svg?style=svg)](https://circleci.com/gh/ErnestIO/network-builder/tree/develop)
+* Master: [![CircleCI Master](https://circleci.com/gh/ernestio/network-builder/tree/master.svg?style=svg)](https://circleci.com/gh/ernestio/network-builder/tree/master)
+* Develop: [![CircleCI Develop](https://circleci.com/gh/ernestio/network-builder/tree/develop.svg?style=svg)](https://circleci.com/gh/ernestio/network-builder/tree/develop)
 
 
 ## Installation
